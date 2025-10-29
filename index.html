@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>اتاق فرار</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Anjoman", sans-serif !important;
+      }
+
+      @font-face {
+        font-family: "Anjoman";
+        src: url("./Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      body,
+      * {
+        font-family: "Anjoman", sans-serif !important;
+      }
+
+      body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #eee;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .page {
+        display: none;
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .container {
+        text-align: center;
+        max-width: 800px;
+      }
+
+      h1 {
+        margin-bottom: 40px;
+        font-size: 2.5em;
+        color: #f39c12;
+        text-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+      }
+
+      .level-indicator {
+        font-size: 14px;
+        color: #95a5a6;
+        margin-bottom: 20px;
+      }
+
+      /* Circle Puzzle Styles */
+      .circle-container {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        margin: 0 auto 60px;
+      }
+
+      .center-circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: 120px;
+        border: 3px solid #f39c12;
+        border-radius: 50%;
+        background: rgba(243, 156, 18, 0.1);
+        box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
+      }
+
+      .slot {
+        position: absolute;
+        width: 70px;
+        height: 70px;
+        border: 2px dashed #3498db;
+        border-radius: 50%;
+        background: rgba(52, 152, 219, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .slot.filled {
+        border: 2px solid #2ecc71;
+        background: rgba(46, 204, 113, 0.2);
+      }
+
+      .slot.drag-over {
+        border-color: #f39c12;
+        background: rgba(243, 156, 18, 0.3);
+        transform: scale(1.1);
+      }
+
+      .slot.locked {
+        border: 2px solid #e74c3c;
+        background: rgba(231, 76, 60, 0.2);
+      }
+
+      .numbers-container {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+
+      .number-tile {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: grab;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .number-tile:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      .number-tile.dragging {
+        opacity: 0.5;
+        cursor: grabbing;
+      }
+
+      .number-tile.hidden {
+        display: none;
+      }
+
+      /* Clock Puzzle Styles */
+      .clock-container {
+        margin: 40px auto;
+        position: relative;
+      }
+
+      .clock {
+        width: 300px;
+        height: 300px;
+        border: 8px solid #f39c12;
+        border-radius: 50%;
+        position: relative;
+        background: radial-gradient(circle, #2c3e50, #1a1a2e);
+        box-shadow: 0 0 30px rgba(243, 156, 18, 0.4),
+          inset 0 0 30px rgba(0, 0, 0, 0.5);
+        margin: 0 auto 50px;
+      }
+
+      .clock-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 120px;
+        font-weight: bold;
+        color: #f39c12;
+        text-shadow: 0 0 20px rgba(243, 156, 18, 0.6);
+        z-index: 10;
+      }
+
+      .clock-number {
+        position: absolute;
+        font-size: 20px;
+        font-weight: bold;
+        color: #f39c12;
+      }
+
+      .n12 {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .n1 {
+        top: 30px;
+        right: 60px;
+      }
+      .n2 {
+        top: 70px;
+        right: 30px;
+      }
+      .n3 {
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+      }
+      .n4 {
+        bottom: 70px;
+        right: 30px;
+      }
+      .n5 {
+        bottom: 30px;
+        right: 60px;
+      }
+      .n6 {
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .n7 {
+        bottom: 30px;
+        left: 60px;
+      }
+      .n8 {
+        bottom: 70px;
+        left: 30px;
+      }
+      .n9 {
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+      }
+      .n10 {
+        top: 70px;
+        left: 30px;
+      }
+      .n11 {
+        top: 30px;
+        left: 60px;
+      }
+
+      .input-container {
+        margin: 30px 0;
+      }
+
+      .time-input {
+        font-size: 32px;
+        padding: 15px 30px;
+        border: 3px solid #3498db;
+        border-radius: 10px;
+        background: rgba(52, 152, 219, 0.1);
+        color: #ecf0f1;
+        text-align: center;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+        width: 200px;
+        transition: all 0.3s ease;
+      }
+
+      .time-input:focus {
+        outline: none;
+        border-color: #f39c12;
+        background: rgba(243, 156, 18, 0.1);
+        box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
+      }
+
+      .time-input::placeholder {
+        color: #7f8c8d;
+      }
+
+      /* Common Styles */
+      button {
+        padding: 15px 40px;
+        font-size: 18px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        margin: 10px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .next-button {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        display: none;
+      }
+
+      .message {
+        margin-top: 20px;
+        font-size: 18px;
+        min-height: 30px;
+        font-weight: bold;
+      }
+
+      .message.error {
+        color: #e74c3c;
+      }
+
+      .message.success {
+        color: #2ecc71;
+      }
+
+      .hint {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .completion {
+        text-align: center;
+        padding: 40px;
+      }
+
+      .completion h1 {
+        font-size: 3em;
+        margin-bottom: 20px;
+      }
+
+      .completion p {
+        font-size: 1.5em;
+        color: #2ecc71;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Page 1: Circle Puzzle -->
+    <div class="page active" id="page1">
+      <div class="container">
+        <div class="level-indicator">مرحله ۱ از ۲</div>
+        <h1>🔐 رمز دایره‌ای</h1>
+
+        <div class="circle-container">
+          <div class="center-circle"></div>
+          <div
+            class="slot locked"
+            data-position="0"
+            style="top: 0; left: 50%; transform: translateX(-50%)"
+          >
+            2000
+          </div>
+          <div
+            class="slot"
+            data-position="1"
+            style="top: 25%; left: 93%; transform: translate(-50%, -50%)"
+          ></div>
+          <div
+            class="slot"
+            data-position="2"
+            style="top: 75%; left: 93%; transform: translate(-50%, -50%)"
+          ></div>
+          <div
+            class="slot"
+            data-position="3"
+            style="bottom: 0; left: 50%; transform: translateX(-50%)"
+          ></div>
+          <div
+            class="slot"
+            data-position="4"
+            style="top: 75%; left: 7%; transform: translate(-50%, -50%)"
+          ></div>
+          <div
+            class="slot"
+            data-position="5"
+            style="top: 25%; left: 7%; transform: translate(-50%, -50%)"
+          ></div>
+        </div>
+
+        <div class="numbers-container" id="numbersContainer">
+          <div class="number-tile" draggable="true" data-value="1">1</div>
+          <div class="number-tile" draggable="true" data-value="10">10</div>
+          <div class="number-tile" draggable="true" data-value="20">20</div>
+          <div class="number-tile" draggable="true" data-value="1">1</div>
+          <div class="number-tile" draggable="true" data-value="1000">1000</div>
+        </div>
+
+        <button onclick="checkCircleOrder()">بررسی!</button>
+        <button class="next-button" id="nextBtn1" onclick="goToPage2()">
+          مرحله بعدی →
+        </button>
+
+        <div class="message" id="message1"></div>
+      </div>
+    </div>
+
+    <!-- Page 2: Clock Puzzle -->
+    <div class="page" id="page2">
+      <div class="container">
+        <div class="level-indicator">مرحله ۲ از ۲</div>
+        <h1>🕐 رمز زمان</h1>
+
+        <div class="clock-container">
+          <div class="clock">
+            <div class="clock-number n12">۱۲</div>
+            <div class="clock-number n1">۱</div>
+            <div class="clock-number n2">۲</div>
+            <div class="clock-number n3">۳</div>
+            <div class="clock-number n4">۴</div>
+            <div class="clock-number n5">۵</div>
+            <div class="clock-number n6">۶</div>
+            <div class="clock-number n7">۷</div>
+            <div class="clock-number n8">۸</div>
+            <div class="clock-number n9">۹</div>
+            <div class="clock-number n10">۱۰</div>
+            <div class="clock-number n11">۱۱</div>
+
+            <div class="clock-center">?</div>
+          </div>
+        </div>
+
+        <div class="input-container" style="direction: ltr !important">
+          <input
+            type="text"
+            class="time-input"
+            id="timeInput"
+            placeholder="ساعت:دقیقه"
+            maxlength="5"
+          />
+        </div>
+
+        <button onclick="checkTime()">بررسی!</button>
+        <button class="next-button" id="nextBtn2" onclick="completePuzzle()">
+          پایان! 🎉
+        </button>
+
+        <div class="message" id="message2"></div>
+        <div class="hint">راهنما: ساعت روی ساعت چند است؟</div>
+      </div>
+    </div>
+
+    <!-- Completion Page -->
+    <div class="page" id="completion">
+      <div class="completion">
+        <h1>🎉 تبریک! 🎉</h1>
+        <p>شما با موفقیت فرار کردید!</p>
+        <p style="margin-top: 20px; font-size: 1.2em; color: #95a5a6">
+          تمام معماها با موفقیت انجام شد!
+        </p>
+        <p style="margin-top: 30px; font-size: 1.1em; color: #e88b40">
+          اگر از معما های ما خوشت اومد، توی کانال تلگراممون هم جوین بده :
+          <a
+            href="https://t.me/narenchi"
+            target="_blank"
+            style="color: #2980b9; text-decoration: underline"
+          >
+            https://t.me/narenchi
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Page 1: Circle Puzzle
+      const correctOrder = [2000, 1000, 1, 20, 10, 1];
+      let draggedElement = null;
+
+      function initCirclePuzzle() {
+        const tiles = document.querySelectorAll(".number-tile");
+        const slots = document.querySelectorAll(".slot:not(.locked)");
+
+        tiles.forEach((tile) => {
+          tile.addEventListener("dragstart", function (e) {
+            draggedElement = this;
+            this.classList.add("dragging");
+            e.dataTransfer.effectAllowed = "move";
+          });
+
+          tile.addEventListener("dragend", function () {
+            this.classList.remove("dragging");
+          });
+        });
+
+        slots.forEach((slot) => {
+          slot.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            this.classList.add("drag-over");
+            e.dataTransfer.dropEffect = "move";
+          });
+
+          slot.addEventListener("dragleave", function () {
+            this.classList.remove("drag-over");
+          });
+
+          slot.addEventListener("drop", function (e) {
+            e.preventDefault();
+            this.classList.remove("drag-over");
+
+            if (draggedElement) {
+              const existingValue = this.textContent;
+              if (existingValue) {
+                const oldTile = document.createElement("div");
+                oldTile.className = "number-tile";
+                oldTile.draggable = true;
+                oldTile.setAttribute("data-value", existingValue);
+                oldTile.textContent = existingValue;
+                setupTileDrag(oldTile);
+                document
+                  .getElementById("numbersContainer")
+                  .appendChild(oldTile);
+              }
+
+              const value = draggedElement.getAttribute("data-value");
+              this.textContent = value;
+              this.classList.add("filled");
+              draggedElement.classList.add("hidden");
+
+              document.getElementById("message1").textContent = "";
+            }
+          });
+        });
+      }
+
+      function setupTileDrag(tile) {
+        tile.addEventListener("dragstart", function (e) {
+          draggedElement = this;
+          this.classList.add("dragging");
+          e.dataTransfer.effectAllowed = "move";
+        });
+
+        tile.addEventListener("dragend", function () {
+          this.classList.remove("dragging");
+        });
+      }
+
+      function resetCircleGame() {
+        const allSlots = document.querySelectorAll(".slot:not(.locked)");
+        allSlots.forEach((slot) => {
+          slot.textContent = "";
+          slot.classList.remove("filled");
+        });
+
+        const existingTiles = document.querySelectorAll(".number-tile");
+        existingTiles.forEach((tile) => tile.remove());
+
+        const numbersContainer = document.getElementById("numbersContainer");
+        const numbers = [1, 10, 20, 1, 1000];
+
+        numbers.forEach((num) => {
+          const tile = document.createElement("div");
+          tile.className = "number-tile";
+          tile.draggable = true;
+          tile.setAttribute("data-value", num);
+          tile.textContent = num;
+          setupTileDrag(tile);
+          numbersContainer.appendChild(tile);
+        });
+
+        document.getElementById("message1").textContent = "";
+      }
+
+      function checkCircleOrder() {
+        const allSlots = document.querySelectorAll(".slot");
+        const currentOrder = [];
+
+        allSlots.forEach((slot) => {
+          const value = slot.textContent.trim();
+          currentOrder.push(value ? parseInt(value) : null);
+        });
+
+        const isCorrect = currentOrder.every(
+          (val, idx) => val === correctOrder[idx]
+        );
+
+        const messageEl = document.getElementById("message1");
+
+        if (isCorrect) {
+          messageEl.textContent = "✓ درست است! به مرحله بعد بروید!";
+          messageEl.className = "message success";
+          document.getElementById("nextBtn1").style.display = "inline-block";
+        } else {
+          messageEl.textContent = "✗ ترتیب نادرست است! دوباره تلاش کنید!";
+          messageEl.className = "message error";
+          setTimeout(resetCircleGame, 1500);
+        }
+      }
+
+      function goToPage2() {
+        document.getElementById("page1").classList.remove("active");
+        document.getElementById("page2").classList.add("active");
+        setTimeout(() => {
+          document.getElementById("timeInput").focus();
+        }, 100);
+      }
+
+      // Page 2: Clock Puzzle
+      const correctTimes = ["8:15", "08:15", "20:15"];
+
+      function initClockPuzzle() {
+        document
+          .getElementById("timeInput")
+          .addEventListener("input", function (e) {
+            let value = e.target.value.replace(/[^0-9]/g, "");
+
+            if (value.length >= 2) {
+              value = value.slice(0, 2) + ":" + value.slice(2, 4);
+            }
+
+            e.target.value = value;
+          });
+
+        document
+          .getElementById("timeInput")
+          .addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              checkTime();
+            }
+          });
+      }
+
+      function checkTime() {
+        const input = document.getElementById("timeInput").value.trim();
+        const messageEl = document.getElementById("message2");
+
+        if (!input) {
+          messageEl.textContent = "⚠ لطفاً یک زمان وارد کنید!";
+          messageEl.className = "message error";
+          return;
+        }
+
+        if (correctTimes.includes(input)) {
+          messageEl.textContent = "✓ درست است! زمان درست است!";
+          messageEl.className = "message success";
+          document.getElementById("nextBtn2").style.display = "inline-block";
+          document.getElementById("timeInput").disabled = true;
+        } else {
+          messageEl.textContent = "✗ زمان نادرست است! دوباره تلاش کنید!";
+          messageEl.className = "message error";
+          setTimeout(resetClockGame, 1500);
+        }
+      }
+
+      function resetClockGame() {
+        document.getElementById("timeInput").value = "";
+        document.getElementById("message2").textContent = "";
+        document.getElementById("timeInput").focus();
+      }
+
+      function completePuzzle() {
+        document.getElementById("page2").classList.remove("active");
+        document.getElementById("completion").classList.add("active");
+      }
+
+      // Initialize on page load
+      window.onload = function () {
+        initCirclePuzzle();
+        initClockPuzzle();
+      };
+    </script>
+  </body>
+</html>
