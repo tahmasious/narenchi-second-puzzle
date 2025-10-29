@@ -25,6 +25,7 @@
         font-family: "Anjoman", sans-serif !important;
       }
 
+      html,
       body {
         background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         color: #eee;
@@ -34,6 +35,8 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
+        width: 100%;
+        overflow-x: hidden;
       }
 
       .page {
@@ -59,6 +62,10 @@
       .container {
         text-align: center;
         max-width: 800px;
+        width: 100%;
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+        margin-inline: auto;
       }
 
       h1 {
@@ -77,8 +84,8 @@
       /* Circle Puzzle Styles */
       .circle-container {
         position: relative;
-        width: 400px;
-        height: 400px;
+        width: min(90vw, 400px);
+        height: min(90vw, 400px);
         margin: 0 auto 60px;
       }
 
@@ -163,6 +170,11 @@
         display: none;
       }
 
+      .number-tile.selected {
+        outline: 3px solid #f39c12;
+        box-shadow: 0 0 12px rgba(243, 156, 18, 0.8);
+      }
+
       /* Clock Puzzle Styles */
       .clock-container {
         margin: 40px auto;
@@ -170,8 +182,8 @@
       }
 
       .clock {
-        width: 300px;
-        height: 300px;
+        width: min(85vw, 300px);
+        height: min(85vw, 300px);
         border: 8px solid #f39c12;
         border-radius: 50%;
         position: relative;
@@ -347,6 +359,66 @@
         font-size: 1.5em;
         color: #2ecc71;
       }
+
+      .completion a {
+        word-break: break-all;
+      }
+
+      @media (max-width: 360px) {
+        .slot {
+          width: 56px;
+          height: 56px;
+          font-size: 20px;
+        }
+        .number-tile {
+          width: 56px;
+          height: 56px;
+          font-size: 20px;
+        }
+        .center-circle {
+          width: 96px;
+          height: 96px;
+        }
+      }
+
+      /* Simple modal for tutorial */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 16px;
+      }
+
+      .modal {
+        background: #1f2a44;
+        border: 2px solid #f39c12;
+        border-radius: 12px;
+        max-width: 520px;
+        width: 100%;
+        color: #ecf0f1;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        padding: 20px 20px 16px;
+      }
+
+      .modal h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        color: #f39c12;
+      }
+
+      .modal p {
+        font-size: 16px;
+        line-height: 1.9;
+      }
+
+      .modal .actions {
+        margin-top: 16px;
+      }
     </style>
   </head>
   <body>
@@ -355,6 +427,26 @@
       <div class="container">
         <div class="level-indicator">مرحله ۱ از ۲</div>
         <h1>🔐 رمز دایره‌ای</h1>
+
+        <!-- Tutorial Modal -->
+        <div
+          class="modal-backdrop"
+          id="tutorialModal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="tutorialTitle"
+        >
+          <div class="modal">
+            <h2 id="tutorialTitle">راهنما</h2>
+            <p>
+              ابتدا عدد مورد نظرتو از پایین انتخاب کن و بعد روی جایگاهی که
+              میخوای عدد رو قرار بدی کلیک کن
+            </p>
+            <div class="actions">
+              <button type="button" id="closeTutorialBtn">باشه</button>
+            </div>
+          </div>
+        </div>
 
         <div class="circle-container">
           <div class="center-circle"></div>
@@ -439,7 +531,7 @@
             type="text"
             class="time-input"
             id="timeInput"
-            placeholder="ساعت:دقیقه"
+            placeholder="HH:MM"
             maxlength="5"
           />
         </div>
@@ -450,7 +542,6 @@
         </button>
 
         <div class="message" id="message2"></div>
-        <div class="hint">راهنما: ساعت روی ساعت چند است؟</div>
       </div>
     </div>
 
@@ -494,6 +585,34 @@
           tile.addEventListener("dragend", function () {
             this.classList.remove("dragging");
           });
+
+          // Touch/click selection for mobile
+          tile.addEventListener("click", function () {
+            if (draggedElement === this) {
+              this.classList.remove("selected");
+              draggedElement = null;
+              return;
+            }
+            document
+              .querySelectorAll(".number-tile.selected")
+              .forEach((t) => t.classList.remove("selected"));
+            draggedElement = this;
+            this.classList.add("selected");
+          });
+
+          tile.addEventListener(
+            "touchstart",
+            function (e) {
+              // Prevent ghost click/scroll
+              e.preventDefault();
+              document
+                .querySelectorAll(".number-tile.selected")
+                .forEach((t) => t.classList.remove("selected"));
+              draggedElement = this;
+              this.classList.add("selected");
+            },
+            { passive: false }
+          );
         });
 
         slots.forEach((slot) => {
@@ -512,27 +631,27 @@
             this.classList.remove("drag-over");
 
             if (draggedElement) {
-              const existingValue = this.textContent;
-              if (existingValue) {
-                const oldTile = document.createElement("div");
-                oldTile.className = "number-tile";
-                oldTile.draggable = true;
-                oldTile.setAttribute("data-value", existingValue);
-                oldTile.textContent = existingValue;
-                setupTileDrag(oldTile);
-                document
-                  .getElementById("numbersContainer")
-                  .appendChild(oldTile);
-              }
-
-              const value = draggedElement.getAttribute("data-value");
-              this.textContent = value;
-              this.classList.add("filled");
-              draggedElement.classList.add("hidden");
-
-              document.getElementById("message1").textContent = "";
+              placeTileIntoSlot(this, draggedElement);
             }
           });
+
+          // Click/touch placement
+          slot.addEventListener("click", function () {
+            if (draggedElement) {
+              placeTileIntoSlot(this, draggedElement);
+            }
+          });
+
+          slot.addEventListener(
+            "touchend",
+            function (e) {
+              e.preventDefault();
+              if (draggedElement) {
+                placeTileIntoSlot(this, draggedElement);
+              }
+            },
+            { passive: false }
+          );
         });
       }
 
@@ -546,6 +665,55 @@
         tile.addEventListener("dragend", function () {
           this.classList.remove("dragging");
         });
+
+        // Also enable selection on dynamically created tiles
+        tile.addEventListener("click", function () {
+          if (draggedElement === this) {
+            this.classList.remove("selected");
+            draggedElement = null;
+            return;
+          }
+          document
+            .querySelectorAll(".number-tile.selected")
+            .forEach((t) => t.classList.remove("selected"));
+          draggedElement = this;
+          this.classList.add("selected");
+        });
+
+        tile.addEventListener(
+          "touchstart",
+          function (e) {
+            e.preventDefault();
+            document
+              .querySelectorAll(".number-tile.selected")
+              .forEach((t) => t.classList.remove("selected"));
+            draggedElement = this;
+            this.classList.add("selected");
+          },
+          { passive: false }
+        );
+      }
+
+      function placeTileIntoSlot(slot, tileEl) {
+        const existingValue = slot.textContent && slot.textContent.trim();
+        if (existingValue) {
+          const oldTile = document.createElement("div");
+          oldTile.className = "number-tile";
+          oldTile.draggable = true;
+          oldTile.setAttribute("data-value", existingValue);
+          oldTile.textContent = existingValue;
+          setupTileDrag(oldTile);
+          document.getElementById("numbersContainer").appendChild(oldTile);
+        }
+
+        const value = tileEl.getAttribute("data-value");
+        slot.textContent = value;
+        slot.classList.add("filled");
+        tileEl.classList.add("hidden");
+        tileEl.classList.remove("selected");
+        draggedElement = null;
+
+        document.getElementById("message1").textContent = "";
       }
 
       function resetCircleGame() {
@@ -670,6 +838,21 @@
       window.onload = function () {
         initCirclePuzzle();
         initClockPuzzle();
+        // Show tutorial modal on first page load
+        const modal = document.getElementById("tutorialModal");
+        const closeBtn = document.getElementById("closeTutorialBtn");
+        if (modal && closeBtn) {
+          modal.style.display = "flex";
+          const hideModal = () => (modal.style.display = "none");
+          closeBtn.addEventListener("click", hideModal);
+          modal.addEventListener("click", (e) => {
+            if (e.target === modal) hideModal();
+          });
+          // Dismiss with ESC
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") hideModal();
+          });
+        }
       };
     </script>
   </body>
