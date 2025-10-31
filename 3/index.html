@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <meta property="og:image" content="https://tympanix.github.io/pattern-lock-js/mockup.jpg" />
+    <title>قفل الگو</title>
+    <style media="screen">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Anjoman", sans-serif !important;
+        }
+
+        @font-face {
+            font-family: "Anjoman";
+            src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body {
+            font-family: "Anjoman", sans-serif !important;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: url('./clock.png') center/70vmin no-repeat;
+            opacity: 0.08;
+            filter: invert(1) brightness(1.6);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            margin: auto;
+            height: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0;
+            height: 15vh;
+            line-height: 15vh;
+            text-align: center;
+            font-size: 6vh;
+            color: #f39c12;
+        }
+
+        #lock {
+            width: 100%;
+            height: calc(100% - 15vh);
+            padding-bottom: 12vh;
+            min-height: 120px;
+        }
+
+        .stars {
+            margin: auto;
+            display: block;
+        }
+    </style>
+
+    <!-- build:css styles.css -->
+    <link rel="stylesheet" href="patternlock.css">
+    <!-- endbuild -->
+
+    
+</head>
+
+<body>
+    <div class="container">
+        <h1>الگو را پیدا کن</h1>
+        <p id="next-level" style="display: none; text-align: center;font-size: 2.8rem;"><a href="./places.html">آفرین! برای مرحله بعد کلیک کن</a></p>
+        <svg class="patternlock" id="lock" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <g class="lock-actives"></g>
+            <g class="lock-lines"></g>
+            <g class="lock-dots">
+                <circle cx="20" cy="20" r="2"/>
+                <circle cx="50" cy="20" r="2"/>
+                <circle cx="80" cy="20" r="2"/>
+
+                <circle cx="20" cy="50" r="2"/>
+                <circle cx="50" cy="50" r="2"/>
+                <circle cx="80" cy="50" r="2"/>
+
+                <circle cx="20" cy="80" r="2"/>
+                <circle cx="50" cy="80" r="2"/>
+                <circle cx="80" cy="80" r="2"/>
+            </g>
+        <svg>
+    </div>
+
+
+    <!-- build:js vendor.js -->
+    <script src="jquery.js" charset="utf-8"></script>
+    <!-- endbuild -->
+
+    <!-- build:js patternlock.js -->
+    <script src="patternlock.js" charset="utf-8"></script>
+    <!-- endbuild -->
+
+    <script type="text/javascript">
+    var e = document.getElementById('lock')
+    var p = new PatternLock(e, {
+        onPattern: function(pattern) {
+            if (pattern == 7852369 || pattern == 9632587){
+                this.success()
+                var nextlink = document.getElementById('next-level');
+                nextlink.style.display = 'block';
+            }else{
+                this.error()
+            }
+        }
+    });
+    </script>
+</body>
+
+</html>
