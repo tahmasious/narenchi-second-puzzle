@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ماشین رمزنگاری</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Anjoman", sans-serif !important;
+      }
+
+      @font-face {
+        font-family: "Anjoman";
+        src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      html,
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      body {
+        font-family: "Anjoman", sans-serif !important;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.08;
+        filter: invert(1) brightness(1.6);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .container {
+        max-width: 1000px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 0 0 20px;
+        font-size: clamp(24px, 5vw, 48px);
+        color: #f39c12;
+        text-shadow: 0 0 10px rgba(243, 156, 18, 0.4);
+      }
+
+      .link-box {
+        background: rgba(243, 156, 18, 0.1);
+        border: 2px solid rgba(243, 156, 18, 0.4);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        text-align: left;
+      }
+
+      .link-instruction {
+        text-align: left;
+        font-size: clamp(16px, 3vw, 20px);
+        color: #f39c12;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .link-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: nowrap;
+        margin-bottom: 15px;
+        overflow-x: auto;
+        padding: 10px 5px;
+      }
+
+      .link-text {
+        font-size: clamp(14px, 2.5vw, 18px);
+        color: #ecf0f1;
+        font-weight: 600;
+        font-family: monospace;
+        white-space: nowrap;
+      }
+
+      .link-input {
+        width: 35px;
+        height: 35px;
+        font-size: clamp(16px, 3vw, 22px);
+        text-align: center;
+        border: 2px solid #3498db;
+        border-radius: 6px;
+        background: rgba(52, 152, 219, 0.15);
+        color: #fff;
+        font-weight: bold;
+        font-family: monospace;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+      }
+
+      .link-input:focus {
+        outline: none;
+        border-color: #f39c12;
+        box-shadow: 0 0 15px rgba(243, 156, 18, 0.5);
+        background: rgba(243, 156, 18, 0.15);
+      }
+
+      .btn-go {
+        padding: 8px 20px;
+        font-size: clamp(13px, 2.5vw, 16px);
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        flex-shrink: 0;
+        margin: 0 5px;
+      }
+
+      .btn-go:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .link-hint {
+        text-align: right;
+        font-size: clamp(12px, 2.5vw, 14px);
+        color: #ecf0f1;
+        line-height: 1.6;
+        padding: 10px;
+        background: rgba(52, 152, 219, 0.1);
+        border-radius: 8px;
+      }
+
+      .description {
+        text-align: center;
+        font-size: clamp(14px, 3vw, 18px);
+        margin-bottom: 30px;
+        color: #ecf0f1;
+        line-height: 1.8;
+      }
+
+      .machine {
+        background: rgba(255, 255, 255, 0.04);
+        border: 2px solid rgba(243, 156, 18, 0.35);
+        border-radius: 16px;
+        padding: 30px 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .gears-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: clamp(10px, 3vw, 30px);
+        flex-wrap: wrap;
+      }
+
+      .gear-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .gear-title {
+        font-size: clamp(14px, 2.5vw, 18px);
+        color: #f39c12;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .gear {
+        width: clamp(180px, 28vw, 250px);
+        height: clamp(180px, 28vw, 250px);
+        position: relative;
+        cursor: grab;
+        user-select: none;
+      }
+
+      .gear:active {
+        cursor: grabbing;
+      }
+
+      .gear-circle {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4),
+          inset 0 0 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .gear-svg {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: rotate(-90deg);
+      }
+
+      .gear-segment {
+        stroke: rgba(255, 255, 255, 0.15);
+        stroke-width: 0.5;
+        transition: opacity 0.2s;
+      }
+
+      .gear-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .gear-center {
+        width: 30%;
+        height: 30%;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+        z-index: 10;
+      }
+
+      .gear-tooth {
+        position: absolute;
+        font-size: clamp(16px, 3vw, 22px);
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 0, 0, 0.3);
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .arrow-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        height: 50px;
+        position: relative;
+      }
+
+      .arrow {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .arrow::before {
+        content: "";
+        width: 0;
+        height: 0;
+        border-left: clamp(10px, 2vw, 16px) solid transparent;
+        border-right: clamp(10px, 2vw, 16px) solid transparent;
+        border-bottom: clamp(15px, 3vw, 24px) solid #f39c12;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      }
+
+      .arrow::after {
+        content: "";
+        width: clamp(3px, 0.6vw, 5px);
+        height: clamp(25px, 4vw, 35px);
+        background: #f39c12;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      }
+
+      .output-display {
+        min-width: 80px;
+        padding: 12px 20px;
+        background: rgba(52, 152, 219, 0.2);
+        border: 2px solid #3498db;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: bold;
+        color: #fff;
+        font-size: clamp(20px, 4vw, 32px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .info {
+        margin-top: 30px;
+        padding: 15px;
+        background: rgba(243, 156, 18, 0.1);
+        border: 1px solid rgba(243, 156, 18, 0.3);
+        border-radius: 8px;
+        font-size: clamp(12px, 2.5vw, 14px);
+        text-align: center;
+        color: #ecf0f1;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 768px) {
+        .gears-container {
+          gap: 15px;
+        }
+
+        .machine {
+          padding: 20px 15px;
+        }
+
+        h1 {
+          margin-bottom: 15px;
+        }
+
+        .description {
+          margin-bottom: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>ماشین چرخ‌دنده‌ای</h1>
+
+      <!-- Link Box -->
+      <div class="link-box" dir="ltr">
+        <div class="link-instruction">🔗 Complete the link:</div>
+        <div class="link-container">
+          <span class="link-text">https://b2n.ir/hr</span>
+          <input
+            type="text"
+            id="linkInput1"
+            class="link-input"
+            maxlength="1"
+            placeholder="_"
+          />
+          <span class="link-text">3</span>
+          <input
+            type="text"
+            id="linkInput2"
+            class="link-input"
+            maxlength="1"
+            placeholder="_"
+          />
+          <button class="btn btn-go" id="goBtn">Go</button>
+        </div>
+        <div class="link-hint" dir="rtl">
+          💡 برای پیدا کردن حروف، چرخ‌دنده اول را روی 一 قرار بده و ببین خروجی
+          دوم و سوم چی هستند!
+        </div>
+      </div>
+
+      <div class="description">
+        چرخ‌دنده‌ها را بچرخان و ببین هر فلش به کدام حرف اشاره می‌کند!
+      </div>
+
+      <div class="machine">
+        <div class="info">
+          💡 چرخ‌دنده اول را بچرخان تا همه با هم بچرخند. چرخ‌دنده‌های دوم و سوم
+          را به تنهایی بچرخان تا موقعیتشان را تنظیم کنی.
+        </div>
+        <br />
+        <div class="gears-container">
+          <!-- Gear 1: Chinese -->
+          <div class="gear-wrapper">
+            <div class="gear-title">ورودی</div>
+            <div class="gear" id="gear1">
+              <div class="gear-circle"></div>
+            </div>
+            <div class="arrow-container">
+              <div class="arrow"></div>
+            </div>
+            <div class="output-display" id="output1">一</div>
+          </div>
+
+          <!-- Gear 2: English -->
+          <div class="gear-wrapper">
+            <div class="gear-title">خروجی ۱</div>
+            <div class="gear" id="gear2">
+              <div class="gear-circle"></div>
+            </div>
+            <div class="arrow-container">
+              <div class="arrow"></div>
+            </div>
+            <div class="output-display" id="output2">A</div>
+          </div>
+
+          <!-- Gear 3: English -->
+          <div class="gear-wrapper">
+            <div class="gear-title">خروجی ۲</div>
+            <div class="gear" id="gear3">
+              <div class="gear-circle"></div>
+            </div>
+            <div class="arrow-container">
+              <div class="arrow"></div>
+            </div>
+            <div class="output-display" id="output3">A</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Character sets for each gear
+      const GEAR_CHARS = {
+        1: [
+          "一",
+          "二",
+          "三",
+          "四",
+          "五",
+          "六",
+          "七",
+          "八",
+          "九",
+          "十",
+          "口",
+          "日",
+          "月",
+          "木",
+          "水",
+          "火",
+          "土",
+          "金",
+          "人",
+          "女",
+          "子",
+          "大",
+        ],
+        2: [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "I",
+          "J",
+          "K",
+          "L",
+          "M",
+          "N",
+          "O",
+          "P",
+          "Q",
+          "R",
+          "S",
+          "T",
+          "U",
+          "V",
+        ],
+        3: [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "I",
+          "J",
+          "K",
+          "L",
+          "M",
+          "N",
+          "O",
+          "P",
+          "Q",
+          "R",
+          "S",
+          "T",
+          "U",
+          "V",
+        ],
+      };
+
+      class Gear {
+        constructor(id, chars) {
+          this.id = id;
+          this.chars = chars;
+          this.element = document.getElementById(`gear${id}`);
+          this.rotation = 0;
+          this.isDragging = false;
+
+          this.initTeeth();
+          this.initDrag();
+        }
+
+        initTeeth() {
+          const circle = this.element.querySelector(".gear-circle");
+          const numTeeth = this.chars.length;
+          const radiusPercent = 42;
+
+          // Create SVG for segments
+          const svg = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "svg"
+          );
+          svg.setAttribute("class", "gear-svg");
+          svg.setAttribute("viewBox", "0 0 100 100");
+
+          const angleStep = 360 / numTeeth;
+
+          // Create colored segments
+          this.chars.forEach((char, index) => {
+            const startAngle = index * angleStep;
+            const endAngle = (index + 1) * angleStep;
+
+            // Calculate path for pie slice
+            const start = this.polarToCartesian(50, 50, 50, endAngle);
+            const end = this.polarToCartesian(50, 50, 50, startAngle);
+            const largeArc = endAngle - startAngle <= 180 ? "0" : "1";
+
+            const pathData = [
+              `M 50 50`,
+              `L ${start.x} ${start.y}`,
+              `A 50 50 0 ${largeArc} 0 ${end.x} ${end.y}`,
+              `Z`,
+            ].join(" ");
+
+            const path = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "path"
+            );
+            path.setAttribute("d", pathData);
+            path.setAttribute("class", "gear-segment");
+
+            // Alternate between two shades of blue
+            const color1 = index % 2 === 0 ? "#3498db" : "#2980b9";
+            const color2 = index % 2 === 0 ? "#2980b9" : "#2574a9";
+            path.setAttribute("fill", `url(#gradient${this.id}-${index})`);
+
+            // Create gradient for this segment
+            const defs =
+              svg.querySelector("defs") ||
+              document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            if (!svg.querySelector("defs")) svg.appendChild(defs);
+
+            const gradient = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "linearGradient"
+            );
+            gradient.setAttribute("id", `gradient${this.id}-${index}`);
+            gradient.setAttribute("x1", "0%");
+            gradient.setAttribute("y1", "0%");
+            gradient.setAttribute("x2", "100%");
+            gradient.setAttribute("y2", "100%");
+
+            const stop1 = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "stop"
+            );
+            stop1.setAttribute("offset", "0%");
+            stop1.setAttribute("style", `stop-color:${color1};stop-opacity:1`);
+
+            const stop2 = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "stop"
+            );
+            stop2.setAttribute("offset", "100%");
+            stop2.setAttribute("style", `stop-color:${color2};stop-opacity:1`);
+
+            gradient.appendChild(stop1);
+            gradient.appendChild(stop2);
+            defs.appendChild(gradient);
+
+            svg.appendChild(path);
+          });
+
+          circle.appendChild(svg);
+
+          // Create overlay container for teeth
+          const overlay = document.createElement("div");
+          overlay.className = "gear-overlay";
+
+          // Add center circle
+          const center = document.createElement("div");
+          center.className = "gear-center";
+          overlay.appendChild(center);
+
+          // Add character labels
+          this.chars.forEach((char, index) => {
+            const tooth = document.createElement("div");
+            tooth.className = "gear-tooth";
+            tooth.textContent = char;
+
+            // Position characters in a circle starting from top (0°)
+            const angle = index * angleStep * (Math.PI / 180);
+            const x = 50 + Math.sin(angle) * radiusPercent;
+            const y = 50 - Math.cos(angle) * radiusPercent;
+
+            tooth.style.left = x + "%";
+            tooth.style.top = y + "%";
+            tooth.style.transform = "translate(-50%, -50%)";
+            tooth.style.position = "absolute";
+
+            overlay.appendChild(tooth);
+          });
+
+          circle.appendChild(overlay);
+        }
+
+        polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+          const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
+          return {
+            x: centerX + radius * Math.cos(angleInRadians),
+            y: centerY + radius * Math.sin(angleInRadians),
+          };
+        }
+
+        initDrag() {
+          let lastAngle = 0;
+
+          const getAngle = (e) => {
+            const rect = this.element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return (
+              Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI)
+            );
+          };
+
+          const onStart = (e) => {
+            this.isDragging = true;
+            lastAngle = getAngle(e);
+            e.preventDefault();
+          };
+
+          const onMove = (e) => {
+            if (!this.isDragging) return;
+
+            const currentAngle = getAngle(e);
+            let delta = currentAngle - lastAngle;
+
+            if (delta > 180) delta -= 360;
+            if (delta < -180) delta += 360;
+
+            // Gear 1 rotates all gears, gears 2 and 3 rotate independently
+            if (this.id === 1) {
+              gears.forEach((gear) => gear.rotate(delta));
+            } else {
+              this.rotate(delta);
+            }
+
+            lastAngle = currentAngle;
+            e.preventDefault();
+          };
+
+          const onEnd = () => {
+            this.isDragging = false;
+          };
+
+          this.element.addEventListener("mousedown", onStart);
+          this.element.addEventListener("touchstart", onStart, {
+            passive: false,
+          });
+          document.addEventListener("mousemove", onMove);
+          document.addEventListener("touchmove", onMove, { passive: false });
+          document.addEventListener("mouseup", onEnd);
+          document.addEventListener("touchend", onEnd);
+        }
+
+        rotate(delta) {
+          this.rotation += delta;
+          this.element.style.transform = `rotate(${this.rotation}deg)`;
+          this.updateDisplay();
+
+          // If gear 1 rotates, update all output gears
+          if (this.id === 1) {
+            if (gears[1]) gears[1].updateDisplay();
+            if (gears[2]) gears[2].updateDisplay();
+          }
+        }
+
+        getTopIndex() {
+          // Calculate which character index is currently at the top (0 degrees)
+          // When rotating clockwise, characters move backward through the array
+          const numChars = this.chars.length;
+          const anglePerChar = 360 / numChars;
+          const normalizedRotation = ((this.rotation % 360) + 360) % 360;
+          const forwardIndex =
+            Math.round(normalizedRotation / anglePerChar) % numChars;
+          // Reverse the direction: subtract from numChars to go backward
+          return (numChars - forwardIndex) % numChars;
+        }
+
+        getBottomIndex() {
+          // Calculate which character index is at the bottom (180 degrees from top)
+          // When rotating clockwise, characters move backward through the array
+          const numChars = this.chars.length;
+          const anglePerChar = 360 / numChars;
+          const normalizedRotation = ((this.rotation % 360) + 360) % 360;
+          const bottomAngle = (normalizedRotation + 180) % 360;
+          // Reverse the direction: subtract from numChars to go backward
+          const forwardIndex =
+            Math.round(bottomAngle / anglePerChar) % numChars;
+          return (numChars - forwardIndex) % numChars;
+        }
+
+        updateDisplay() {
+          const outputDisplay = document.getElementById(`output${this.id}`);
+
+          // Show bottom character (where arrow points) in output display
+          const bottomIndex = this.getBottomIndex();
+          outputDisplay.textContent = this.chars[bottomIndex];
+        }
+      }
+
+      // Initialize gears
+      const gears = [
+        new Gear(1, GEAR_CHARS[1]),
+        new Gear(2, GEAR_CHARS[2]),
+        new Gear(3, GEAR_CHARS[3]),
+      ];
+
+      // Initialize displays
+      gears.forEach((gear) => gear.updateDisplay());
+
+      // Link functionality
+      const linkInput1 = document.getElementById("linkInput1");
+      const linkInput2 = document.getElementById("linkInput2");
+      const goBtn = document.getElementById("goBtn");
+
+      // Check if both inputs are filled
+      function checkInputs() {
+        const filled = linkInput1.value.trim() && linkInput2.value.trim();
+        goBtn.disabled = !filled;
+      }
+
+      // Enable/disable button based on inputs
+      linkInput1.addEventListener("input", checkInputs);
+      linkInput2.addEventListener("input", checkInputs);
+
+      // Auto-focus to next input
+      linkInput1.addEventListener("input", function () {
+        if (this.value.trim()) {
+          linkInput2.focus();
+        }
+      });
+
+      // Go to link when button clicked
+      goBtn.addEventListener("click", function () {
+        const char1 = linkInput1.value.trim();
+        const char2 = linkInput2.value.trim();
+        if (char1 && char2) {
+          const fullLink = `https://b2n.ir/hr${char1}3${char2}`;
+          window.open(fullLink, "_blank");
+        }
+      });
+
+      // Allow Enter key to go
+      linkInput1.addEventListener("keypress", function (e) {
+        if (e.key === "Enter" && this.value.trim()) {
+          linkInput2.focus();
+        }
+      });
+
+      linkInput2.addEventListener("keypress", function (e) {
+        if (e.key === "Enter" && linkInput1.value.trim() && this.value.trim()) {
+          goBtn.click();
+        }
+      });
+
+      // Initially disable button
+      goBtn.disabled = true;
+    </script>
+  </body>
+</html>
