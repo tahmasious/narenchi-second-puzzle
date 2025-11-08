@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>شروع</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Anjoman", sans-serif !important;
+      }
+      @font-face {
+        font-family: "Anjoman";
+        src: url("./Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      html,
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .start-button {
+        padding: 18px 48px;
+        font-size: 22px;
+        color: #1a1a2e;
+        background: #f39c12;
+        border: none;
+        border-radius: 999px;
+        box-shadow: 0 12px 30px rgba(243, 156, 18, 0.35);
+        cursor: pointer;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .start-button:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(243, 156, 18, 0.45);
+      }
+      .start-button:active {
+        transform: translateY(0);
+        box-shadow: 0 10px 20px rgba(243, 156, 18, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      class="start-button"
+      onclick="window.location.href = './5/index.html';"
+    >
+      شروع اسکیپ ریلز 5 ام
+    </button>
+  </body>
+</html>

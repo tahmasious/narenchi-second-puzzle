@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>گالری نقاشی</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Anjoman", sans-serif !important;
+      }
+      @font-face {
+        font-family: "Anjoman";
+        src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      html,
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #f1f2f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      body {
+        position: relative;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+            circle at 15% 20%,
+            rgba(243, 156, 18, 0.18),
+            transparent 60%
+          ),
+          radial-gradient(
+            circle at 80% 85%,
+            rgba(52, 152, 219, 0.16),
+            transparent 65%
+          );
+        pointer-events: none;
+        opacity: 0.85;
+      }
+      .wrapper {
+        width: min(1100px, 100%);
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+      h1 {
+        font-size: clamp(30px, 6vw, 44px);
+        color: #f39c12;
+        text-shadow: 0 0 16px rgba(243, 156, 18, 0.6);
+        margin-bottom: 10px;
+      }
+      .subtitle {
+        font-size: 17px;
+        line-height: 1.9;
+        color: #dcdde1;
+        margin-bottom: 28px;
+      }
+      .hint {
+        font-size: 15px;
+        color: #95a5a6;
+        margin-bottom: 32px;
+      }
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: clamp(18px, 3vw, 28px);
+      }
+      .art-card {
+        perspective: 1600px;
+        cursor: pointer;
+        position: relative;
+        transition: transform 0.3s ease;
+      }
+      .art-card:focus-within,
+      .art-card:hover {
+        transform: translateY(-6px);
+      }
+      .art-inner {
+        position: relative;
+        width: 100%;
+        padding-top: 140%;
+        transform-style: preserve-3d;
+        transition: transform 0.75s cubic-bezier(0.23, 1, 0.32, 1);
+        border-radius: 22px;
+        box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35);
+      }
+      .art-card.flipped .art-inner {
+        transform: rotateY(180deg);
+      }
+      .art-face {
+        position: absolute;
+        inset: 0;
+        border-radius: 22px;
+        overflow: hidden;
+        backface-visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .art-face.front {
+        background: #0f172a;
+      }
+      .art-face.front img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .art-face.back {
+        transform: rotateY(180deg);
+        background: linear-gradient(145deg, #1b2536, #12192a);
+        border: 2px solid rgba(243, 156, 18, 0.45);
+        flex-direction: column;
+        gap: 12px;
+        padding: 30px 20px;
+      }
+      .art-face.back .phi {
+        font-size: clamp(32px, 6vw, 48px);
+        color: #f39c12;
+        text-shadow: 0 0 18px rgba(243, 156, 18, 0.7);
+        font-weight: 700;
+      }
+      .art-card button {
+        position: absolute;
+        inset: 0;
+        border: none;
+        background: transparent;
+        border-radius: 22px;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .art-card button:focus-visible {
+        outline: 3px solid rgba(243, 156, 18, 0.75);
+        outline-offset: 4px;
+      }
+      @media (max-width: 520px) {
+        body {
+          padding: 20px 16px 32px;
+        }
+        .subtitle,
+        .hint {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrapper">
+      <h1>نمایشگاه رمزدار</h1>
+      <p class="subtitle">
+        هر تابلو راز خودش را پنهان کرده. روی نقاشی‌ها کلیک کن یا لمس کن تا
+        بچرخند و مقدار Φ را پیدا کنی. کدوم Φ درسته ؟
+        <br />
+        جواب نهایی رو برامون کامنت کن یا دایرکت بفرست و ماهم اگر درست بود به
+        عنوان برنده معرفیت می کنیم
+      </p>
+      <section class="gallery">
+        <article class="art-card" data-phi="412">
+          <div class="art-inner">
+            <div class="art-face front">
+              <img src="./2.jpg" alt="تابلو شماره یک" loading="lazy" />
+            </div>
+            <div class="art-face back">
+              <span class="phi">Φ = 412</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="نمایش مقدار Φ در تابلو شماره یک"
+          ></button>
+        </article>
+        <article class="art-card" data-phi="678">
+          <div class="art-inner">
+            <div class="art-face front">
+              <img src="./2.PNG" alt="تابلو شماره دو" loading="lazy" />
+            </div>
+            <div class="art-face back">
+              <span class="phi">Φ = 678</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="نمایش مقدار Φ در تابلو شماره دو"
+          ></button>
+        </article>
+        <article class="art-card" data-phi="215">
+          <div class="art-inner">
+            <div class="art-face front">
+              <img
+                src="./free-images-national-gallery-of-art-8.jpg"
+                alt="تابلو شماره سه"
+                loading="lazy"
+              />
+            </div>
+            <div class="art-face back">
+              <span class="phi">Φ = 215</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="نمایش مقدار Φ در تابلو شماره سه"
+          ></button>
+        </article>
+        <article class="art-card" data-phi="587">
+          <div class="art-inner">
+            <div class="art-face front">
+              <img
+                src="./free-images-national-gallery-of-art-9.jpg"
+                alt="تابلو شماره چهار"
+                loading="lazy"
+              />
+            </div>
+            <div class="art-face back">
+              <span class="phi">Φ = 587</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="نمایش مقدار Φ در تابلو شماره چهار"
+          ></button>
+        </article>
+        <article class="art-card" data-phi="804">
+          <div class="art-inner">
+            <div class="art-face front">
+              <img
+                src="./free-images-national-gallery-of-art-10.jpg"
+                alt="تابلو شماره پنج"
+                loading="lazy"
+              />
+            </div>
+            <div class="art-face back">
+              <span class="phi">Φ = 804</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="نمایش مقدار Φ در تابلو شماره پنج"
+          ></button>
+        </article>
+        <article class="art-card" data-phi="333">
+          <div class="art-inner">
+            <div class="art-face front">
+              <img
+                src="./Van-Gogh-Self-Portrait.jpg"
+                alt="تابلو شماره شش"
+                loading="lazy"
+              />
+            </div>
+            <div class="art-face back">
+              <span class="phi">Φ = 333</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="نمایش مقدار Φ در تابلو شماره شش"
+          ></button>
+        </article>
+      </section>
+    </main>
+    <script>
+      const cards = document.querySelectorAll(".art-card");
+
+      cards.forEach((card) => {
+        const toggle = () => card.classList.toggle("flipped");
+        const button = card.querySelector("button");
+
+        card.addEventListener("click", (event) => {
+          if (event.target instanceof HTMLButtonElement) {
+            toggle();
+          }
+        });
+
+        button.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggle();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
