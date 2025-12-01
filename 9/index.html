@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>قفل کتابی</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Anjoman", sans-serif !important;
+      }
+      @font-face {
+        font-family: "Anjoman";
+        src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      html,
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      body {
+        position: relative;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+            circle at top,
+            rgba(243, 156, 18, 0.2),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at bottom,
+            rgba(52, 152, 219, 0.12),
+            transparent 60%
+          );
+        opacity: 0.8;
+        pointer-events: none;
+      }
+      .wrapper {
+        max-width: 480px;
+        width: 100%;
+        text-align: center;
+        z-index: 1;
+        position: relative;
+      }
+      h1 {
+        font-size: clamp(28px, 6vw, 40px);
+        color: #f39c12;
+        text-shadow: 0 0 15px rgba(243, 156, 18, 0.6);
+        margin-bottom: 18px;
+      }
+      p.description {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #dcdde1;
+        margin-bottom: 24px;
+      }
+      .lock {
+        position: relative;
+        width: min(90vw, 320px);
+        margin: 0 auto 24px;
+      }
+      .lock-shackle {
+        width: 55%;
+        height: 140px;
+        border: 12px solid rgba(236, 240, 241, 0.7);
+        border-bottom: none;
+        border-radius: 140px 140px 0 0;
+        margin: 0 auto -28px;
+        position: relative;
+        z-index: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(236, 240, 241, 0.2),
+          transparent
+        );
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+      }
+      .lock-body {
+        position: relative;
+        background: linear-gradient(
+          180deg,
+          #2c3e50 0%,
+          #1b2535 70%,
+          #101726 100%
+        );
+        border-radius: 24px;
+        padding: 28px 24px 30px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+        border: 2px solid rgba(243, 156, 18, 0.35);
+        z-index: 1;
+      }
+      .lock-body::before {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        pointer-events: none;
+      }
+      .buttons-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(90px, 1fr));
+        gap: 20px 24px;
+        justify-items: center;
+        margin-top: 12px;
+      }
+      .lock-button {
+        position: relative;
+        width: 92px;
+        height: 92px;
+        border-radius: 18px;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(180deg, #576574, #222f3e);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease,
+          background 0.2s ease;
+      }
+      .lock-button::after {
+        content: "";
+        position: absolute;
+        inset: 10px;
+        border-radius: 14px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.18),
+          transparent
+        );
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+      }
+      .lock-button.up {
+        transform: translateY(-12px);
+        background: linear-gradient(180deg, #718093, #2f3640);
+        box-shadow: 0 16px 26px rgba(0, 0, 0, 0.45),
+          inset 0 2px 4px rgba(255, 255, 255, 0.12);
+      }
+      .lock-button.down {
+        transform: translateY(12px);
+        background: linear-gradient(180deg, #2f3640, #111821);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.55),
+          inset 0 -3px 6px rgba(0, 0, 0, 0.45);
+      }
+      .lock-button:focus-visible {
+        outline: 3px solid rgba(243, 156, 18, 0.7);
+        outline-offset: 4px;
+      }
+      .hint {
+        font-size: 14px;
+        color: #95a5a6;
+        margin-top: 12px;
+        line-height: 1.6;
+      }
+      .actions {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      button.action-btn {
+        padding: 14px 34px;
+        font-size: 17px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35);
+      }
+      button.action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 26px rgba(0, 0, 0, 0.4);
+      }
+      button.action-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35);
+      }
+      .message {
+        margin-top: 20px;
+        font-size: 17px;
+        font-weight: bold;
+        min-height: 28px;
+      }
+      .message.error {
+        color: #e74c3c;
+      }
+      .message.success {
+        color: #2ecc71;
+      }
+      .next-stage {
+        display: none;
+        margin-top: 24px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #27ae60;
+      }
+      .next-stage:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>قفل کتابی</h1>
+      <p class="description">
+        دکمه‌های قفل را طوری تنظیم کن که ترکیب درست ایجاد شود. برای هر دکمه
+        می‌توانی حالت بالا یا پایین را فعال کنی؛ وقتی مطمئنی، روی «باز کردن قفل»
+        بزن.
+      </p>
+      <div class="lock" aria-live="polite">
+        <div class="lock-shackle" aria-hidden="true"></div>
+        <div class="lock-body">
+          <div class="buttons-grid" role="group" aria-label="کلیدهای قفل">
+            <button
+              class="lock-button down"
+              data-position="0"
+              aria-pressed="false"
+              aria-label="ردیف اول، دکمه چپ"
+            ></button>
+            <button
+              class="lock-button down"
+              data-position="1"
+              aria-pressed="false"
+              aria-label="ردیف اول، دکمه راست"
+            ></button>
+            <button
+              class="lock-button down"
+              data-position="2"
+              aria-pressed="false"
+              aria-label="ردیف دوم، دکمه چپ"
+            ></button>
+            <button
+              class="lock-button down"
+              data-position="3"
+              aria-pressed="false"
+              aria-label="ردیف دوم، دکمه راست"
+            ></button>
+            <button
+              class="lock-button down"
+              data-position="4"
+              aria-pressed="false"
+              aria-label="ردیف سوم، دکمه چپ"
+            ></button>
+            <button
+              class="lock-button down"
+              data-position="5"
+              aria-pressed="false"
+              aria-label="ردیف سوم، دکمه راست"
+            ></button>
+          </div>
+        </div>
+      </div>
+      <p class="hint">
+        هینت: می‌تونی روی هر دکمه کلیک کنی تا بین حالت بالا و پایین جا‌به‌جا
+        بشه. درست که شد، روی «باز کردن قفل» بزن.
+      </p>
+      <div class="actions">
+        <button type="button" class="action-btn" id="openLockBtn">
+          باز کردن قفل
+        </button>
+        <button type="button" class="action-btn" id="resetBtn">ریست</button>
+      </div>
+      <div class="message" id="feedback" role="status"></div>
+      <a href="./paintings.html" class="next-stage" id="nextStageLink">
+        مرحله بعدی →
+      </a>
+    </div>
+    <script>
+      const buttons = Array.from(document.querySelectorAll(".lock-button"));
+      const feedback = document.getElementById("feedback");
+      const nextStageLink = document.getElementById("nextStageLink");
+      const correctCombination = ["up", "down", "down", "up", "up", "up"];
+
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => toggleButton(btn));
+        btn.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggleButton(btn);
+          }
+        });
+      });
+
+      function toggleButton(btn) {
+        const isUp = btn.classList.contains("up");
+        btn.classList.toggle("up", !isUp);
+        btn.classList.toggle("down", isUp);
+        const isNowUp = !isUp;
+        btn.setAttribute("aria-pressed", isNowUp.toString());
+      }
+
+      document
+        .getElementById("openLockBtn")
+        .addEventListener("click", checkCombination);
+
+      document.getElementById("resetBtn").addEventListener("click", resetLock);
+
+      function getCurrentCombination() {
+        return buttons.map((btn) =>
+          btn.classList.contains("up") ? "up" : "down"
+        );
+      }
+
+      function checkCombination() {
+        const current = getCurrentCombination();
+        const isCorrect = current.every(
+          (state, idx) => state === correctCombination[idx]
+        );
+
+        if (isCorrect) {
+          feedback.textContent = "✓ قفل باز شد! آفرین.";
+          feedback.className = "message success";
+          nextStageLink.style.display = "inline-block";
+          setTimeout(() => {
+            window.scrollTo({
+              top: nextStageLink.offsetTop - 40,
+              behavior: "smooth",
+            });
+          }, 50);
+        } else {
+          feedback.textContent = "✗ هنوز درست نشده! دوباره تلاش کن.";
+          feedback.className = "message error";
+          nextStageLink.style.display = "none";
+        }
+      }
+
+      function resetLock() {
+        buttons.forEach((btn) => {
+          btn.classList.remove("up");
+          btn.classList.add("down");
+          btn.setAttribute("aria-pressed", "false");
+        });
+        feedback.textContent = "";
+        feedback.className = "message";
+        nextStageLink.style.display = "none";
+      }
+    </script>
+  </body>
+</html>
