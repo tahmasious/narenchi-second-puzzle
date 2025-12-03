@@ -87,6 +87,29 @@
             margin-top: 10px;
             font-size: 30px;
         }
+
+        .btn {
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: #fff;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .hint-button-wrap {
+            text-align: center;
+            margin: 10px 0;
+        }
     </style>
 
     <!-- build:css styles.css -->
@@ -100,7 +123,10 @@
     <div class="container">
         <!-- <div class="hint-orange">θ → I</div> -->
         <h1>الگو را پیدا کن</h1>
-        <p style="text-align: center; font-size: large;">هر ساعت، سه نقطه را نشان می دهد. به ترتیب، هر ساعت را به هم وصل کن.</p>
+        <p class="hint-button-wrap">
+            <button id="show-hint" class="btn">دیدن راهنمایی</button>
+        </p>
+        <p id="hint-text" style="display: none; text-align: center; font-size: large;">هر ساعت، سه نقطه را نشان می دهد. به ترتیب، هر ساعت را به هم وصل کن.</p>
         <p id="next-level" style="display: none; text-align: center;font-size: 2.8rem;"><a href="./end.html">آفرین! برای مرحله بعد کلیک کن</a></p>
         <svg class="patternlock" id="lock" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <g class="lock-actives"></g>
@@ -143,6 +169,11 @@
                 this.error()
             }
         }
+    });
+    document.getElementById('show-hint').addEventListener('click', function() {
+        var hint = document.getElementById('hint-text');
+        hint.style.display = 'block';
+        this.style.display = 'none';
     });
     </script>
 </body>
