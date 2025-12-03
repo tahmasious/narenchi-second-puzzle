@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      property="og:image"
+      content="https://tympanix.github.io/pattern-lock-js/mockup.jpg"
+    />
+    <title>انتخاب مکان</title>
+    <style media="screen">
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Anjoman", sans-serif !important;
+      }
+
+      @font-face {
+        font-family: "Anjoman";
+        src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      html,
+      body {
+        padding: 0;
+        margin: 0;
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      body {
+        font-family: "Anjoman", sans-serif !important;
+      }
+
+      .container {
+        margin: auto;
+        height: 100%;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 0 0 16px;
+        height: auto;
+        line-height: 1.4;
+        font-size: 28px;
+        color: #f39c12;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 820px;
+        padding: 16px;
+        margin: 0 auto;
+      }
+
+      .boxes {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin: 12px 0 22px;
+        flex-wrap: wrap;
+      }
+
+      .box {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: all 0.25s ease;
+      }
+
+      .box:hover {
+        transform: translateY(-3px);
+      }
+      .box.selected {
+        outline: 3px solid #f39c12;
+        box-shadow: 0 0 12px rgba(243, 156, 18, 0.8);
+      }
+      .box.used {
+        opacity: 0.35;
+        pointer-events: none;
+      }
+
+      .places {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(100px, 1fr));
+        gap: 14px;
+        justify-items: center;
+        margin: 10px auto 18px;
+        max-width: 720px;
+      }
+
+      .place {
+        width: 100%;
+        min-height: 96px;
+        border: 2px dashed #3498db;
+        border-radius: 12px;
+        background: rgba(52, 152, 219, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: 700;
+        transition: all 0.25s ease;
+      }
+
+      .place.filled {
+        border: 2px solid #2ecc71;
+        background: rgba(46, 204, 113, 0.18);
+      }
+      .place.highlight {
+        border-color: #f39c12;
+        background: rgba(243, 156, 18, 0.25);
+        transform: scale(1.02);
+      }
+
+      .actions {
+        text-align: center;
+        margin-top: 6px;
+      }
+      .btn {
+        padding: 12px 32px;
+        font-size: 16px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: all 0.25s ease;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      .message {
+        margin-top: 14px;
+        font-size: 16px;
+        min-height: 28px;
+        font-weight: 700;
+        text-align: center;
+      }
+      .message.error {
+        color: #e74c3c;
+      }
+      .message.success {
+        color: #2ecc71;
+      }
+
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 16px;
+      }
+      .modal {
+        background: #1f2a44;
+        border: 2px solid #f39c12;
+        border-radius: 12px;
+        max-width: 520px;
+        width: 100%;
+        color: #ecf0f1;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        padding: 20px 20px 16px;
+      }
+      .modal h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        color: #f39c12;
+      }
+      .modal p {
+        font-size: 16px;
+        line-height: 1.9;
+      }
+      .modal .actions {
+        margin-top: 16px;
+      }
+    </style>
+
+    <!-- build:css styles.css -->
+    <link rel="stylesheet" href="patternlock.css" />
+    <!-- endbuild -->
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="wrap">
+        <div
+          class="modal-backdrop"
+          id="tutorialModal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="tutorialTitle"
+        >
+          <div class="modal">
+            <h2 id="tutorialTitle">راهنما</h2>
+            <p>
+              ابتدا یکی از جعبه‌ها را انتخاب کن، سپس روی یکی از مکان‌ها کلیک کن.
+              بعد از تکمیل چهار انتخاب، دکمه ثبت را بزن.
+            </p>
+            <div class="actions">
+              <button type="button" id="closeTutorialBtn" class="btn">
+                باشه
+              </button>
+            </div>
+          </div>
+        </div>
+        <h1>انتخاب مکان(راست به چپ)</h1>
+        <div class="places" id="places">
+          <div class="place" data-index="0">_</div>
+          <div class="place" data-index="1">_</div>
+          <div class="place" data-index="2">_</div>
+          <div class="place" data-index="3">_</div>
+        </div>
+        <div class="boxes" id="boxes">
+          <div class="box" data-value="pi">π</div>
+          <div class="box" data-value="theta">θ</div>
+          <div class="box" data-value="lambda">λ</div>
+          <div class="box" data-value="sigma">Σ</div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="submitBtn">ثبت</button>
+        </div>
+        <div class="message" id="msg"></div>
+      </div>
+    </div>
+    <script>
+      const correctOrder = ["theta", "lambda", "pi", "sigma"];
+      let selectedBox = null;
+
+      function initBoxes() {
+        document.querySelectorAll(".box").forEach((b) => {
+          b.addEventListener("click", function () {
+            if (this.classList.contains("used")) return;
+            document
+              .querySelectorAll(".box.selected")
+              .forEach((x) => x.classList.remove("selected"));
+            selectedBox = this;
+            this.classList.add("selected");
+          });
+        });
+      }
+
+      function initPlaces() {
+        document.querySelectorAll(".place").forEach((p) => {
+          p.addEventListener("mouseenter", function () {
+            this.classList.add("highlight");
+          });
+          p.addEventListener("mouseleave", function () {
+            this.classList.remove("highlight");
+          });
+          p.addEventListener("click", function () {
+            if (!selectedBox) return;
+            const val = selectedBox.getAttribute("data-value");
+            const old = this.getAttribute("data-value");
+            if (old) {
+              const oldBox = document.querySelector(
+                '.box[data-value="' + old + '"]'
+              );
+              if (oldBox) oldBox.classList.remove("used");
+            }
+            this.setAttribute("data-value", val);
+            this.classList.add("filled");
+            this.textContent =
+              this.textContent.replace(/\s*\(.*\)$/, "") +
+              " (" +
+              symbolFor(val) +
+              ")";
+            selectedBox.classList.add("used");
+            selectedBox.classList.remove("selected");
+            selectedBox = null;
+            document.getElementById("msg").textContent = "";
+          });
+        });
+      }
+
+      function getSelection() {
+        const res = [];
+        document.querySelectorAll(".place").forEach((p) => {
+          const v = p.getAttribute("data-value");
+          res.push(v ? v : null);
+        });
+        return res;
+      }
+
+      function symbolFor(k) {
+        if (k === "pi") return "π";
+        if (k === "theta") return "θ";
+        if (k === "lambda") return "λ";
+        if (k === "sigma") return "Σ";
+        return k;
+      }
+
+      function validate() {
+        const sel = getSelection();
+        console.log(sel);
+        console.log(correctOrder);
+        if (sel.some((v) => v === null)) {
+          setMessage("لطفاً همه مکان‌ها را پر کن", true);
+          return;
+        }
+        const ok = sel.every((v, i) => v === correctOrder[i]);
+        if (ok) {
+          setMessage("درست است!", false);
+          window.location.href = "./end.html";
+        } else {
+          setMessage("اشتباه بود! دوباره تلاش کن", true);
+          setTimeout(reset, 1200);
+        }
+      }
+
+      function reset() {
+        document.querySelectorAll(".place").forEach((p) => {
+          p.removeAttribute("data-value");
+          p.classList.remove("filled");
+          const name = p.textContent.replace(/\s*\(.*\)$/, "");
+          p.textContent = name;
+        });
+        document.querySelectorAll(".box").forEach((b) => {
+          b.classList.remove("selected", "used");
+        });
+        selectedBox = null;
+        setMessage("", false);
+      }
+
+      function setMessage(t, isError) {
+        const el = document.getElementById("msg");
+        el.textContent = t;
+        el.className = "message " + (isError ? "error" : "success");
+      }
+
+      function initModal() {
+        const modal = document.getElementById("tutorialModal");
+        const closeBtn = document.getElementById("closeTutorialBtn");
+        if (modal && closeBtn) {
+          modal.style.display = "flex";
+          const hide = () => (modal.style.display = "none");
+          closeBtn.addEventListener("click", hide);
+          modal.addEventListener("click", (e) => {
+            if (e.target === modal) hide();
+          });
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") hide();
+          });
+        }
+      }
+
+      document.getElementById("submitBtn").addEventListener("click", validate);
+      initBoxes();
+      initPlaces();
+      initModal();
+    </script>
+  </body>
+</html>
