@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>مرحله 11</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Anjoman", sans-serif !important;
+        }
+
+        @font-face {
+            font-family: "Anjoman";
+            src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: rgb(230, 254, 252);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .code-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 48px;
+            font-weight: bold;
+            direction: ltr;
+        }
+
+        .bracket {
+            color: #000;
+            font-size: 48px;
+        }
+
+        .code-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            border: 3px solid #000;
+            border-radius: 8px;
+            background: transparent;
+            color: #000;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .code-input:focus {
+            border-color: #000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .digit-wrapper {
+            position: relative;
+            width: 50px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .placeholder {
+            color: #000;
+            font-size: 48px;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .code-input.hidden {
+            display: none;
+        }
+
+        .placeholder.hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4444;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            direction: rtl;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="code-container">
+        <span class="bracket">[</span>
+        <div class="digit-wrapper">
+            <input type="text" class="code-input" id="digit1" maxlength="1" autocomplete="off" />
+            <span class="placeholder" id="placeholder1">_</span>
+        </div>
+        <div class="digit-wrapper">
+            <input type="text" class="code-input" id="digit2" maxlength="1" autocomplete="off" />
+            <span class="placeholder" id="placeholder2">_</span>
+        </div>
+        <div class="digit-wrapper">
+            <input type="text" class="code-input" id="digit3" maxlength="1" autocomplete="off" />
+            <span class="placeholder" id="placeholder3">_</span>
+        </div>
+        <div class="digit-wrapper">
+            <input type="text" class="code-input" id="digit4" maxlength="1" autocomplete="off" />
+            <span class="placeholder" id="placeholder4">_</span>
+        </div>
+        <span class="bracket">]</span>
+    </div>
+
+    <div class="notification" id="notification">کد اشتباه است!</div>
+
+    <script>
+        const inputs = [
+            document.getElementById('digit1'),
+            document.getElementById('digit2'),
+            document.getElementById('digit3'),
+            document.getElementById('digit4')
+        ];
+
+        const placeholders = [
+            document.getElementById('placeholder1'),
+            document.getElementById('placeholder2'),
+            document.getElementById('placeholder3'),
+            document.getElementById('placeholder4')
+        ];
+
+        // Initialize: show placeholders, hide inputs
+        inputs.forEach((input, index) => {
+            input.classList.add('hidden');
+        });
+
+        // Show first input when user starts typing
+        placeholders.forEach((placeholder, index) => {
+            placeholder.addEventListener('click', function() {
+                if (index === 0 || inputs[index - 1].value.length > 0) {
+                    inputs[index].classList.remove('hidden');
+                    placeholders[index].classList.add('hidden');
+                    inputs[index].focus();
+                }
+            });
+        });
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                const value = e.target.value.toUpperCase();
+                e.target.value = value;
+
+                if (value.length === 1) {
+                    // Hide placeholder for current input
+                    placeholders[index].classList.add('hidden');
+                    
+                    // Move to next input
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].classList.remove('hidden');
+                        placeholders[index + 1].classList.add('hidden');
+                        inputs[index + 1].focus();
+                    } else {
+                        // All inputs filled, check code
+                        checkCode();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && e.target.value === '') {
+                    if (index > 0) {
+                        // Hide current input, show placeholder
+                        inputs[index].classList.add('hidden');
+                        placeholders[index].classList.remove('hidden');
+                        
+                        // Go to previous input
+                        inputs[index - 1].classList.remove('hidden');
+                        placeholders[index - 1].classList.add('hidden');
+                        inputs[index - 1].focus();
+                        inputs[index - 1].value = '';
+                    }
+                }
+            });
+
+            input.addEventListener('focus', function() {
+                this.select();
+            });
+        });
+
+        function checkCode() {
+            const code = inputs.map(input => input.value).join('');
+            if (code === 'R3CO') {
+                window.location.href = './end.html';
+            } else {
+                // Show notification
+                const notification = document.getElementById('notification');
+                notification.classList.add('show');
+                
+                // Hide notification after 5 seconds
+                setTimeout(function() {
+                    notification.classList.remove('show');
+                }, 5000);
+                
+                // Reset all inputs
+                inputs.forEach((input, index) => {
+                    input.value = '';
+                    if (index === 0) {
+                        input.classList.remove('hidden');
+                        placeholders[index].classList.add('hidden');
+                    } else {
+                        input.classList.add('hidden');
+                        placeholders[index].classList.remove('hidden');
+                    }
+                });
+                inputs[0].focus();
+            }
+        }
+
+        // Show first input on page load and focus
+        window.addEventListener('load', function() {
+            inputs[0].classList.remove('hidden');
+            placeholders[0].classList.add('hidden');
+            inputs[0].focus();
+        });
+    </script>
+</body>
+
+</html>
+
