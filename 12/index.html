@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 12 - انتخاب اتاق</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Anjoman", sans-serif !important;
+      }
+
+      @font-face {
+        font-family: "Anjoman";
+        src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: rgb(167, 225, 228);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        width: 100%;
+      }
+
+      h1 {
+        color: black;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2em;
+      }
+
+      .rooms-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 30px 20px;
+        }
+
+        h1 {
+          font-size: 1.5em;
+          margin-bottom: 20px;
+        }
+
+        .rooms-grid {
+          grid-template-columns: repeat(4, 1fr);
+          gap: 8px;
+        }
+
+        .room-btn {
+          padding: 12px;
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+
+        .container {
+          padding: 20px 15px;
+        }
+
+        h1 {
+          font-size: 1.3em;
+          margin-bottom: 15px;
+        }
+
+        .rooms-grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 6px;
+        }
+
+        .room-btn {
+          padding: 10px;
+          font-size: 13px;
+        }
+
+        .password-inputs {
+          gap: 10px;
+          margin: 20px 0;
+        }
+
+        .password-inputs input {
+          width: 50px;
+          height: 50px;
+          font-size: 28px;
+        }
+
+        .hint {
+          font-size: 16px;
+        }
+
+        .submit-btn,
+        .download-btn {
+          font-size: 16px;
+          padding: 12px;
+        }
+      }
+
+      .room-btn {
+        padding: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        border: 2px solid #333;
+        border-radius: 8px;
+        background: white;
+        color: black;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .room-btn:hover {
+        background: rgb(167, 225, 228);
+        transform: scale(1.05);
+      }
+
+      .password-section {
+        display: none;
+      }
+
+      .password-section.active {
+        display: block;
+      }
+
+      .rooms-section.hidden {
+        display: none;
+      }
+
+      .password-inputs {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 30px 0;
+        direction: ltr;
+      }
+
+      .password-inputs input {
+        width: 60px;
+        height: 60px;
+        font-size: 32px;
+        text-align: center;
+        border: 2px solid #333;
+        border-radius: 8px;
+        direction: ltr;
+      }
+
+      .password-inputs input:focus {
+        outline: none;
+        border-color: rgb(100, 180, 185);
+      }
+
+      .hint {
+        text-align: center;
+        color: black;
+        font-size: 18px;
+        margin: 20px 0;
+      }
+
+      .submit-btn,
+      .download-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        background: #333;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+      }
+
+      .submit-btn:hover,
+      .download-btn:hover {
+        background: #555;
+      }
+
+      .error {
+        color: red;
+        text-align: center;
+        margin-top: 15px;
+        display: none;
+      }
+
+      .error.show {
+        display: block;
+      }
+
+      .back-btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 2px solid #333;
+        border-radius: 8px;
+        background: white;
+        color: black;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+
+      .back-btn:hover {
+        background: #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="rooms-section">
+        <h1>انتخاب اتاق</h1>
+        <button
+          class="download-btn"
+          style="margin-bottom: 12px"
+          onclick="downloadMap()"
+        >
+          دانلود نقشه
+        </button>
+        <div class="rooms-grid">
+          <button class="room-btn" onclick="selectRoom(1)">1</button>
+          <button class="room-btn" onclick="selectRoom(2)">2</button>
+          <button class="room-btn" onclick="selectRoom(3)">3</button>
+          <button class="room-btn" onclick="selectRoom(4)">4</button>
+          <button class="room-btn" onclick="selectRoom(5)">5</button>
+          <button class="room-btn" onclick="selectRoom(6)">6</button>
+          <button class="room-btn" onclick="selectRoom(7)">7</button>
+          <button class="room-btn" onclick="selectRoom(8)">8</button>
+          <button class="room-btn" onclick="selectRoom(9)">9</button>
+          <button class="room-btn" onclick="selectRoom(10)">10</button>
+          <button class="room-btn" onclick="selectRoom(11)">11</button>
+          <button class="room-btn" onclick="selectRoom(12)">12</button>
+          <button class="room-btn" onclick="selectRoom(13)">13</button>
+          <button class="room-btn" onclick="selectRoom(14)">14</button>
+          <button class="room-btn" onclick="selectRoom(15)">15</button>
+          <button class="room-btn" onclick="selectRoom(16)">16</button>
+          <button class="room-btn" onclick="selectRoom(17)">17</button>
+          <button class="room-btn" onclick="selectRoom(18)">18</button>
+          <button class="room-btn" onclick="selectRoom(19)">19</button>
+          <button class="room-btn" onclick="selectRoom(20)">20</button>
+          <button class="room-btn" onclick="selectRoom(21)">21</button>
+          <button class="room-btn" onclick="selectRoom(22)">22</button>
+          <button class="room-btn" onclick="selectRoom(23)">23</button>
+          <button class="room-btn" onclick="selectRoom(24)">24</button>
+          <button class="room-btn" onclick="selectRoom(25)">25</button>
+          <button class="room-btn" onclick="selectRoom(26)">26</button>
+          <button class="room-btn" onclick="selectRoom(27)">27</button>
+          <button class="room-btn" onclick="selectRoom(28)">28</button>
+          <button class="room-btn" onclick="selectRoom(29)">29</button>
+          <button class="room-btn" onclick="selectRoom(30)">30</button>
+        </div>
+      </div>
+
+      <div class="password-section">
+        <h1>رمز عددی را وارد کنید</h1>
+        <div class="password-inputs">
+          <input
+            type="text"
+            maxlength="1"
+            id="digit1"
+            oninput="moveToNext(this, 'digit2')"
+          />
+          <input
+            type="text"
+            maxlength="1"
+            id="digit2"
+            oninput="moveToNext(this, 'digit3')"
+          />
+          <input
+            type="text"
+            maxlength="1"
+            id="digit3"
+            oninput="moveToNext(this, null)"
+          />
+        </div>
+        <p class="hint">(راهنمایی: رمز = L * P)</p>
+        <button class="submit-btn" onclick="checkPassword()">تایید</button>
+        <p class="error" id="error">رمز یا اتاق اشتباه است!</p>
+        <button class="back-btn" onclick="goBack()">بازگشت</button>
+      </div>
+    </div>
+
+    <script>
+      let selectedRoom = null;
+
+      function selectRoom(roomNumber) {
+        selectedRoom = roomNumber;
+        document.querySelector(".rooms-section").classList.add("hidden");
+        document.querySelector(".password-section").classList.add("active");
+        document.getElementById("digit1").focus();
+      }
+
+      function moveToNext(current, nextId) {
+        if (current.value.length === 1 && nextId) {
+          document.getElementById(nextId).focus();
+        }
+      }
+
+      function checkPassword() {
+        const digit1 = document.getElementById("digit1").value;
+        const digit2 = document.getElementById("digit2").value;
+        const digit3 = document.getElementById("digit3").value;
+        const password = digit1 + digit2 + digit3;
+
+        if (selectedRoom === 22 && password === "276") {
+          window.location.href = "end.html";
+        } else {
+          document.getElementById("error").classList.add("show");
+          setTimeout(() => {
+            document.getElementById("error").classList.remove("show");
+          }, 3000);
+        }
+      }
+
+      function goBack() {
+        document.querySelector(".rooms-section").classList.remove("hidden");
+        document.querySelector(".password-section").classList.remove("active");
+        document.getElementById("digit1").value = "";
+        document.getElementById("digit2").value = "";
+        document.getElementById("digit3").value = "";
+        selectedRoom = null;
+      }
+
+      function downloadMap() {
+        const link = document.createElement("a");
+        link.href = "map.png";
+        link.download = "map.png";
+        link.click();
+      }
+
+      // اجازه فقط اعداد
+      document.querySelectorAll(".password-inputs input").forEach((input) => {
+        input.addEventListener("keypress", (e) => {
+          if (!/[0-9]/.test(e.key)) {
+            e.preventDefault();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
