@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 13 - شکل‌ها</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Anjoman", sans-serif !important;
+      }
+
+      @font-face {
+        font-family: "Anjoman";
+        src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        gap: 40px;
+      }
+
+      .title {
+        color: #f39c12;
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .slots-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      .slot {
+        width: 100px;
+        height: 100px;
+        border: 3px solid #f39c12;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .slot.filled {
+        background: rgba(243, 156, 18, 0.2);
+        border-color: #f39c12;
+      }
+
+      .shape {
+        width: 60px;
+        height: 60px;
+        position: absolute;
+      }
+
+      .shape.square {
+        background: #808080;
+        border: 3px solid #666666;
+      }
+
+      .shape.circle {
+        background: #808080;
+        border: 3px solid #666666;
+        border-radius: 50%;
+      }
+
+      .shape.triangle {
+        width: 0;
+        height: 0;
+        border-left: 30px solid transparent;
+        border-right: 30px solid transparent;
+        border-bottom: 52px solid #808080;
+        background: transparent;
+        border-top: none;
+      }
+
+      .shape.multiple {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      .shape.multiple .shape {
+        position: relative;
+        width: 35px;
+        height: 35px;
+      }
+
+      .shape.multiple .shape.triangle {
+        width: 0;
+        height: 0;
+        border-left: 17px solid transparent;
+        border-right: 17px solid transparent;
+        border-bottom: 30px solid #808080;
+        border-top: none;
+      }
+
+      .buttons-container {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .shape-button {
+        width: 120px;
+        height: 120px;
+        border: 3px solid #f39c12;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .shape-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4);
+        background: rgba(243, 156, 18, 0.2);
+      }
+
+      .shape-button:active {
+        transform: translateY(0);
+      }
+
+      .shape-button .shape {
+        position: relative;
+      }
+
+      .notification {
+        position: fixed;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ff4444;
+        color: white;
+        padding: 16px 32px;
+        border-radius: 8px;
+        font-size: 20px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        direction: rtl;
+      }
+
+      .notification.show {
+        opacity: 1;
+      }
+
+      .notification.success {
+        background: #2ecc71;
+      }
+
+      @media (max-width: 768px) {
+        .slot {
+          width: 80px;
+          height: 80px;
+        }
+
+        .shape-button {
+          width: 100px;
+          height: 100px;
+        }
+
+        .title {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">مرحله 13</h1>
+
+    <div class="slots-container">
+      <div class="slot" id="slot1"></div>
+      <div class="slot" id="slot2"></div>
+      <div class="slot" id="slot3"></div>
+      <div class="slot" id="slot4"></div>
+      <div class="slot" id="slot5"></div>
+      <div class="slot" id="slot6"></div>
+      <div class="slot" id="slot7"></div>
+    </div>
+
+    <div class="buttons-container">
+      <button class="shape-button" onclick="selectShape('square')">
+        <div class="shape square"></div>
+      </button>
+      <button class="shape-button" onclick="selectShape('triangle')">
+        <div class="shape triangle"></div>
+      </button>
+      <button class="shape-button" onclick="selectShape('circle')">
+        <div class="shape circle"></div>
+      </button>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+      const slots = [
+        document.getElementById("slot1"),
+        document.getElementById("slot2"),
+        document.getElementById("slot3"),
+        document.getElementById("slot4"),
+        document.getElementById("slot5"),
+        document.getElementById("slot6"),
+        document.getElementById("slot7"),
+      ];
+
+      const sequence = [];
+      const correctSequence = ["square", "circle", "square", "triangle", "circle", "square", "triangle"];
+
+      function selectShape(shape) {
+        // Find the first empty slot
+        let slotIndex = -1;
+
+        for (let i = 0; i < slots.length; i++) {
+          if (!slots[i].classList.contains("filled")) {
+            slotIndex = i;
+            break;
+          }
+        }
+
+        if (slotIndex === -1) {
+          // All slots filled, check answer
+          checkAnswer();
+          return;
+        }
+
+        // Add shape to slot
+        addShapeToSlot(slotIndex, shape);
+        sequence.push(shape);
+        
+        // Check if all slots are filled
+        const allFilled = slots.every((slot) => slot.classList.contains("filled"));
+        if (allFilled) {
+          setTimeout(() => {
+            checkAnswer();
+          }, 300);
+        }
+      }
+
+      function addShapeToSlot(slotIndex, shape) {
+        const slot = slots[slotIndex];
+        slot.classList.add("filled");
+
+        const shapeDiv = document.createElement("div");
+        shapeDiv.className = `shape ${shape}`;
+        slot.appendChild(shapeDiv);
+      }
+
+      function checkAnswer() {
+        // Check if sequence matches
+        const isCorrect =
+          sequence.length === correctSequence.length &&
+          sequence.every((shape, index) => shape === correctSequence[index]);
+
+        if (isCorrect) {
+          showNotification("درست است! در حال انتقال...", true);
+          setTimeout(() => {
+            window.location.href = "./end.html";
+          }, 1000);
+        } else {
+          showNotification("اشتباه است! دوباره تلاش کنید.");
+          setTimeout(() => {
+            resetSlots();
+          }, 2000);
+        }
+      }
+
+      function resetSlots() {
+        slots.forEach((slot) => {
+          slot.classList.remove("filled");
+          slot.innerHTML = "";
+        });
+        sequence.length = 0;
+      }
+
+      function showNotification(message, isSuccess = false) {
+        const notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.classList.remove("success");
+        if (isSuccess) {
+          notification.classList.add("success");
+        }
+        notification.classList.add("show");
+
+        setTimeout(() => {
+          notification.classList.remove("show");
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>
+

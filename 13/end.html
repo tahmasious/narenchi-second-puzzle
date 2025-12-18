@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>پایان</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Anjoman", sans-serif !important;
+      }
+      @font-face {
+        font-family: "Anjoman";
+        src: url("../Anjoman-FaNum-Regular.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      html,
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      body {
+        position: relative;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: url("./clock.png") center/70vmin no-repeat;
+        opacity: 0.08;
+        filter: invert(1) brightness(1.6);
+        pointer-events: none;
+        z-index: 0;
+      }
+      .container {
+        text-align: center;
+        max-width: 800px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+      .phi {
+        font-size: clamp(96px, 18vw, 220px);
+        line-height: 1;
+        color: #f39c12;
+        text-shadow: 0 0 20px rgba(243, 156, 18, 0.6);
+        margin-bottom: 16px;
+        letter-spacing: 2px;
+      }
+      .text {
+        font-size: 20px;
+        line-height: 2;
+        color: #ecf0f1;
+        background: rgba(255, 255, 255, 0.04);
+        border: 2px solid rgba(243, 156, 18, 0.35);
+        border-radius: 12px;
+        padding: 18px 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="phi">جواب = 115</div>
+      <div class="text">
+        <p>اسکیپ ریلز رو با موفقیت تموم کردی !</p>
+        <p>
+          کد این مرحله 115 هست اگه دوست داشتی توی کامنت های پست برامون کامنتش کن
+          تا ما هم توی استوری ها به عنوان فرد برنده معرفیت کنیم.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
